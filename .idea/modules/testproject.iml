@@ -194,6 +194,5 @@
     <orderEntry type="library" name="Maven: com.google.oauth-client:google-oauth-client-java6:1.20.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.http-client:google-http-client-jackson:1.22.0" level="project" />
     <orderEntry type="library" name="Maven: com.google.cloud.spark:spark-bigquery-with-dependencies_2.11:0.13.1-beta" level="project" />
-    <orderEntry type="library" name="Maven: org.apache.spark:spark-streaming-flume-assembly_2.11:2.2.0" level="project" />
   </component>
 </module>
