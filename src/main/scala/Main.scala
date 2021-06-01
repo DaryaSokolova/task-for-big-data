@@ -22,7 +22,7 @@ object Main {
         ssc,
         projectID,
         None,
-        "seas_reader",
+        "jhgfdvbhfg-sub",
         SparkGCPCredentials.builder.build(), StorageLevel.MEMORY_AND_DISK_SER_2)
 
     processSeasData(crashesStream, windowInterval, slidingInterval, spark, bigQueryDataset)

@@ -30,7 +30,7 @@ object SeasData {
 
   private def writeToBigquery(data: DataFrame, datasetName: String, tableName: String): Unit =
     data.write.format("bigquery").option("table", f"$datasetName.$tableName")
-      .option("temporaryGcsBucket", "new_bucket_ssu1").mode(SaveMode.Append).save()
+      .option("temporaryGcsBucket", "temp_bucket_for_table").mode(SaveMode.Append).save()
 
   def processSeasData(stream: DStream[SparkPubsubMessage], windowInterval: Int, slidingInterval: Int,
                       spark: SparkSession, bigQueryDataset: String): Unit = {
@@ -45,7 +45,7 @@ object SeasData {
           writeToBigquery(findMinSeasByElevation(seaDF), bigQueryDataset, "min")
 
           seaDF.write.mode(SaveMode.Append).partitionBy("TimeStamp")
-            .parquet("gs://alien-vim-314816/test_output")
+            .parquet("gs://test_output/table_temp")
       }
   }
 }
