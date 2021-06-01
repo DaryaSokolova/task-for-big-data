@@ -16,17 +16,7 @@ object SeasData {
         count("*").as("Count_Seas"),
         first("TimeStamp").as("TimeStamp")
       )
-      .filter("Rank == 1")
-
-  private def findMinSeasByElevation(input: DataFrame) =
-    input
-      .groupBy("elevation")
-      .agg(
-        row_number().over(orderBy(count("*").desc)).as("Rank"),
-        count("*").as("Count_Seas"),
-        first("TimeStamp").as("TimeStamp")
-      )
-      .filter("Rank == 2")
+      .filter("Rank <= 3")
 
   private def writeToBigquery(data: DataFrame, datasetName: String, tableName: String): Unit =
     data.write.format("bigquery").option("table", f"$datasetName.$tableName")
@@ -42,7 +32,6 @@ object SeasData {
             .cache()
 
           writeToBigquery(findMaxSeasByElevation(seaDF), bigQueryDataset, "max")
-          writeToBigquery(findMinSeasByElevation(seaDF), bigQueryDataset, "min")
 
           seaDF.write.mode(SaveMode.Append).partitionBy("TimeStamp")
             .parquet("gs://test_output/table_temp")
