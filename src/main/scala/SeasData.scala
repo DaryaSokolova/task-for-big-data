@@ -34,7 +34,7 @@ object SeasData {
           writeToBigquery(findMaxSeasByElevation(seaDF), bigQueryDataset, "max")
 
           seaDF.write.mode(SaveMode.Append).partitionBy("TimeStamp")
-            .parquet("gs://test_output/table_temp")
+            .parquet("alien-vim-314816:test_output.table_temp")
       }
   }
 }
