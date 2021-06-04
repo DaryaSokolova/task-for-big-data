@@ -38,7 +38,7 @@ object Convert {
   def extractSeas(input: RDD[SparkPubsubMessage]): RDD[Row] = {
     input.map(message => new String(message.getData(), StandardCharsets.UTF8))
       .filter(.length != 0)
-    .map(_.split(""",(?=(?:[^"]"[^"]")[^"]$)"""))
+    .map(_.split(""",(?=(?:[^"]*"[^"]*")*[^"]*$)"""))
       .map {
         attribute =>
           nullConverterList(attribute.take(5).toList) :::
