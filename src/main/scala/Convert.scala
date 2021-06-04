@@ -10,11 +10,11 @@ object Convert {
 
   val schema: StructType = StructType(
     List(
-      StructField("id", IntegerType, nullable = true),
+      StructField("id", StringType , nullable = true),
       StructField("name", StringType, nullable = true),
       StructField("address", StringType, nullable = true),
-      StructField("lon", FloatType, nullable = true),
-      StructField("lat", FloatType, nullable = true),
+      StructField("lon", StringType, nullable = true),
+      StructField("lat", StringType, nullable = true),
       StructField("elevation", IntegerType, nullable = true)
     )
   )
@@ -36,14 +36,13 @@ object Convert {
   }
 
   def extractSeas(input: RDD[SparkPubsubMessage]): RDD[Row] = {
-    input.map(message => new String(message.getData(), StandardCharsets.UTF_8))
-      .filter(_.length != 0)
-      .map(_.split(""",(?=(?:[^"]*"[^"]*")*[^"]*$)"""))
+    input.map(message => new String(message.getData(), StandardCharsets.UTF8))
+      .filter(.length != 0)
+    .map(_.split(""",(?=(?:[^"]"[^"]")[^"]$)"""))
       .map {
         attribute =>
-          nullConverterList(attribute.take(11).toList) :::
-            List(convertToInt(attribute(11))) :::
-            nullConverterList(attribute.takeRight(11).toList)
+          nullConverterList(attribute.take(5).toList) :::
+            List(convertToInt(attribute(5)))
       }
       .map(attribute => Row.fromSeq(attribute))
   }
