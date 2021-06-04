@@ -12,7 +12,7 @@ object SeasData {
     input
       .groupBy("elevation")
       .agg(
-        row_number().over(orderBy(count("*").asc)).as("Rank"),
+        row_number().over(orderBy(desc("elevation"))).as("Rank"),
         count("*").as("Count_Seas"),
         first("TimeStamp").as("TimeStamp")
       )
@@ -20,13 +20,25 @@ object SeasData {
 
   private def findMinSeasByElevation(input: DataFrame) =
     input
+      .where("elevation != 0")
       .groupBy("elevation")
       .agg(
-        row_number().over(orderBy(desc("elevation"))).as("Rank"),
+        row_number().over(orderBy(asc("elevation"))).as("Rank"),
         count("*").as("Count_Seas"),
         first("TimeStamp").as("TimeStamp")
       )
       .filter("Rank <= 1")
+
+  private def findMeanSeasByElevation(input: DataFrame) =
+    input.select(avg(input("elevation"))).show()
+
+  private def findCountSeasByElevation(input: DataFrame) =
+    input
+      .groupBy("elevation")
+      .agg(
+        count("*").as("Count_Seas"),
+        first("TimeStamp").as("TimeStamp")
+      )
 
   private def writeToBigquery(data: DataFrame, datasetName: String, tableName: String): Unit =
     data.write.format("bigquery").option("table", f"$datasetName.$tableName")
@@ -41,9 +53,10 @@ object SeasData {
             .withColumn("TimeStamp", lit(date_format(current_timestamp(), "dd.MM.yyyy_hh-mm")))
             .cache()
 
-          //writeToBigquery(findTop3ByElevation(seaDF), bigQueryDataset, "output")
           writeToBigquery(findMaxSeasByElevation(seaDF), bigQueryDataset, "output")
           writeToBigquery(findMinSeasByElevation(seaDF), bigQueryDataset, "output")
+          writeToBigquery(findCountSeasByElevation(seaDF), bigQueryDataset, "count")
+          findMeanSeasByElevation(seaDF)
 
           seaDF.write.mode(SaveMode.Overwrite).partitionBy("timestamp")
             .parquet("gs://bucket_for_parquet/app_output")
