@@ -12,11 +12,21 @@ object SeasData {
     input
       .groupBy("elevation")
       .agg(
-        row_number().over(orderBy(count("*").desc)).as("Rank"),
+        row_number().over(orderBy(count("*").asc)).as("Rank"),
         count("*").as("Count_Seas"),
         first("TimeStamp").as("TimeStamp")
       )
-      .filter("Rank <= 3")
+      .filter("Rank <= 1")
+
+  private def findMinSeasByElevation(input: DataFrame) =
+    input
+      .groupBy("elevation")
+      .agg(
+        row_number().over(orderBy(desc("elevation"))).as("Rank"),
+        count("*").as("Count_Seas"),
+        first("TimeStamp").as("TimeStamp")
+      )
+      .filter("Rank <= 1")
 
   private def writeToBigquery(data: DataFrame, datasetName: String, tableName: String): Unit =
     data.write.format("bigquery").option("table", f"$datasetName.$tableName")
@@ -31,9 +41,11 @@ object SeasData {
             .withColumn("TimeStamp", lit(date_format(current_timestamp(), "dd.MM.yyyy_hh-mm")))
             .cache()
 
+          //writeToBigquery(findTop3ByElevation(seaDF), bigQueryDataset, "output")
           writeToBigquery(findMaxSeasByElevation(seaDF), bigQueryDataset, "output")
+          writeToBigquery(findMinSeasByElevation(seaDF), bigQueryDataset, "output")
 
-          seaDF.write.mode(SaveMode.Append).partitionBy("timestamp")
+          seaDF.write.mode(SaveMode.Overwrite).partitionBy("timestamp")
             .parquet("gs://bucket_for_parquet/app_output")
       }
   }
