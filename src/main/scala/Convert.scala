@@ -36,13 +36,14 @@ object Convert {
   }
 
   def extractSeas(input: RDD[SparkPubsubMessage]): RDD[Row] = {
-    input.map(message => new String(message.getData(), StandardCharsets.UTF8))
-      .filter(.length != 0)
-    .map(_.split(""",(?=(?:[^"]*"[^"]*")*[^"]*$)"""))
+    input.map(message => new String(message.getData(), StandardCharsets.UTF_8))
+      .filter(_.length != 0)
+      .map(_.split(""",(?=(?:[^"]*"[^"]*")*[^"]*$)"""))
       .map {
         attribute =>
           nullConverterList(attribute.take(5).toList) :::
-            List(convertToInt(attribute(5)))
+            List(convertToInt(attribute(5))) :::
+            nullConverterList(attribute.takeRight(5).toList)
       }
       .map(attribute => Row.fromSeq(attribute))
   }
