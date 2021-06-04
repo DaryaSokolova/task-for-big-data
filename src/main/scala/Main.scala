@@ -22,7 +22,7 @@ object Main {
         ssc,
         projectID,
         None,
-        "projects/alien-vim-314816/subscriptions/jhgfdvbhfg-sub",
+        "jhgfdvbhfg-sub",
         SparkGCPCredentials.builder.build(), StorageLevel.MEMORY_AND_DISK_SER_2)
 
     processSeasData(crashesStream, windowInterval, slidingInterval, spark, bigQueryDataset)
