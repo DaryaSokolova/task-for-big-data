@@ -31,9 +31,9 @@ object SeasData {
             .withColumn("TimeStamp", lit(date_format(current_timestamp(), "dd.MM.yyyy_hh-mm")))
             .cache()
 
-          writeToBigquery(findMaxSeasByElevation(seaDF), bigQueryDataset, "max")
+          writeToBigquery(findMaxSeasByElevation(seaDF), bigQueryDataset, "output")
 
-          seaDF.write.mode(SaveMode.Append).partitionBy("timeStamp")
+          seaDF.write.mode(SaveMode.Append).partitionBy("timestamp")
             .parquet("gs://bucket_for_parquet/app_output")
       }
   }
